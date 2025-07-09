@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Searchverse — Avatar Memory Trails</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Share Tech Mono', monospace;
+      background: linear-gradient(to right, #1f003b, #10002b, #000);
+      color: #e2e2ff;
+    }
+    header {
+      text-align: center;
+      padding: 40px 10px 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8em;
+      color: #ff76c6;
+      text-shadow: 0 0 8px #ff00ccaa;
+    }
+    #map {
+      height: 75vh;
+      width: 90%;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 25px #00ffee88;
+    }
+    .console {
+      text-align: center;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.3);
+      width: 90%;
+      margin: auto;
+      border-radius: 10px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.8em;
+      opacity: 0.5;
+      padding: 20px;
+    }
+    button {
+      background: #ff76c6;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <header>Searchverse — Avatar Memory Trails</header>
+  <div class="console">
+    <p><strong id="avatarName">Loading Avatar...</strong></p>
+    <button onclick="dropMemory()">Drop Memory Orb</button>
+    <p><em>Drag map, zoom, explore... leave traces behind.</em></p>
+  </div>
+  <div id="map"></div>
+  <div class="footer">© 2025 NeuroChrome Collective | 🌌 Trail the Grid</div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'OpenStreetMap Memory Grid'
+    }).addTo(map);
+
+    // 🧍🏽‍♂️ Generate Random Avatar Name
+    function getRandomAvatar() {
+      const titles = ['EchoSeeker', 'NovaStalker', 'MindDrifter', 'GlitchVoyager', 'VelvetNode'];
+      return titles[Math.floor(Math.random() * titles.length)] + '_' + Math.floor(Math.random() * 1000);
+    }
+
+    let avatar = localStorage.getItem('avatar') || getRandomAvatar();
+    document.getElementById('avatarName').innerText = `🧍🏽 You are ${avatar}`;
+    localStorage.setItem('avatar', avatar);
+
+    // 💾 Load previous memory orbs
+    const savedOrbs = JSON.parse(localStorage.getItem('memoryOrbs') || '[]');
+    savedOrbs.forEach(orb => {
+      L.circleMarker([orb.lat, orb.lng], {
+        radius: 8,
+        color: '#ff00cc',
+        fillColor: '#ff76c6',
+        fillOpacity: 0.7
+      }).addTo(map).bindPopup(orb.message);
+    });
+
+    // 💫 Drop new orb
+    function dropMemory() {
+      const center = map.getCenter();
+      const vibe = prompt("What's your vibe right now? 🤔");
+      const message = `<strong>${avatar} dropped a memory:</strong><br><em>${vibe}</em><br>🕒 ${new Date().toLocaleString()}`;
+
+      L.circleMarker([center.lat, center.lng], {
+        radius: 8,
+        color: '#ff00cc',
+        fillColor: '#ff76c6',
+        fillOpacity: 0.7
+      }).addTo(map).bindPopup(message).openPopup();
+
+      savedOrbs.push({ lat: center.lat, lng: center.lng, message });
+      localStorage.setItem('memoryOrbs', JSON.stringify(savedOrbs));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Echo Node Grid — Coldwater</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Share Tech Mono', monospace;
+      background: radial-gradient(circle, #1a0000, #300000, #000);
+      color: #e2e2ff;
+      overflow-x: hidden;
+    }
+    header {
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2em;
+      color: #ff2e2e;
+      text-shadow: 0 0 10px #ff0000aa;
+      padding: 20px;
+    }
+    .console {
+      text-align: center;
+      padding: 15px;
+      background-color: rgba(0,0,0,0.4);
+      margin: 10px auto;
+      width: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff000066;
+    }
+    #map {
+      height: 70vh;
+      width: 90%;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 25px #ff000055;
+    }
+    button {
+      background: #ff2e2e;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.8em;
+      opacity: 0.5;
+      color: #ff2e2e;
+    }
+  </style>
+</head>
+<body>
+  <header>📍 Echo Node Grid — Coldwater</header>
+  <div class="console">
+    <strong id="avatarName">Loading cursed avatar...</strong><br>
+    <button onclick="dropEcho()">Drop Echo Node</button>
+    <p><em>Zoom the map. Leave your memory. Feed the grid.</em></p>
+  </div>
+
+  <div id="map"></div>
+  <div class="footer">© 2025 NeuroChrome Collective | Infernal Grid Mapper</div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([40.519, -82.979], 13); // Coldwater, OH
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map of Madness by OpenStreetMap'
+    }).addTo(map);
+
+    // Generate cursed avatar
+    function getAvatar() {
+      const list = ['WormListener', 'BleedWalker', 'SignalHost', 'StaticCaller', 'LilaWatcher'];
+      return list[Math.floor(Math.random() * list.length)] + '_' + Math.floor(Math.random() * 999);
+    }
+    let avatar = localStorage.getItem('avatar') || getAvatar();
+    document.getElementById('avatarName').innerText = `🧍🏾 You are ${avatar}`;
+    localStorage.setItem('avatar', avatar);
+
+    // Load old Echo Nodes
+    const echoes = JSON.parse(localStorage.getItem('echoes') || '[]');
+    echoes.forEach(e => {
+      L.circleMarker([e.lat, e.lng], {
+        radius: 8,
+        color: '#ff0000',
+        fillColor: '#ff2e2e',
+        fillOpacity: 0.6
+      }).addTo(map).bindPopup(e.message);
+    });
+
+    // Drop new memory node
+    function dropEcho() {
+      const center = map.getCenter();
+      const emotion = prompt("What's haunting you? 🩸");
+      const msg = `<strong>${avatar} left an echo:</strong><br><em>${emotion}</em><br>🕒 ${new Date().toLocaleString()}`;
+      L.circleMarker([center.lat, center.lng], {
+        radius: 8,
+        color: '#ff0000',
+        fillColor: '#ff2e2e',
+        fillOpacity: 0.6
+      }).addTo(map).bindPopup(msg).openPopup();
+      echoes.push({ lat: center.lat, lng: center.lng, message: msg });
+      localStorage.setItem('echoes', JSON.stringify(echoes));
+    }
+  </script>
+</body>
+</html>
